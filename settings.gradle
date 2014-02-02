@@ -1,1 +1,1 @@
-include ':GraphViewLibrary'
+include ':GraphViewLibrary', ':GraphTest'

@@ -1,0 +1,18 @@
+apply plugin: 'android'
+
+android {
+    compileSdkVersion 18
+    buildToolsVersion "19.0.1"
+
+    defaultConfig {
+        minSdkVersion 7
+        targetSdkVersion 16
+        versionCode 1
+        versionName "1.0"
+    }
+}
+
+dependencies {
+    compile 'com.android.support:support-v4:+'
+    compile 'com.android.support:appcompat-v7:+'
+}
