@@ -475,28 +475,54 @@ abstract public class GraphView extends LinearLayout {
 	 * @deprecated use {@link #setCustomLabelFormatter(CustomLabelFormatter)}
 	 * @return value to display
 	 */
-	@Deprecated
-	protected String formatLabel(double value, boolean isValueX) {
-		if (customLabelFormatter != null) {
+	protected String formatLabel(double value, boolean isValueX)
+	{
+
+		if (customLabelFormatter != null)
+		{
 			String label = customLabelFormatter.formatLabel(value, isValueX);
-			if (label != null) {
+			if (label != null)
+			{
 				return label;
 			}
 		}
+
 		int i = isValueX ? 1 : 0;
-		if (numberformatter[i] == null) {
+
+		// BEGIN COB
+		int decimalSetVertical = getGraphViewStyle().getVerticalLabelsDecimalCount();
+		// END COB
+		if (numberformatter[i] == null)
+		{
 			numberformatter[i] = NumberFormat.getNumberInstance();
 			double highestvalue = isValueX ? getMaxX(false) : getMaxY();
 			double lowestvalue = isValueX ? getMinX(false) : getMinY();
-			if (highestvalue - lowestvalue < 0.1) {
+			// BEGIN COB
+			if (!isValueX && decimalSetVertical > 0)
+			{
+				numberformatter[i].setMaximumFractionDigits(decimalSetVertical);
+				numberformatter[i].setMinimumFractionDigits(decimalSetVertical);
+			}
+			else
+			// END COB
+			if (highestvalue - lowestvalue < 0.1)
+			{
 				numberformatter[i].setMaximumFractionDigits(6);
-			} else if (highestvalue - lowestvalue < 1) {
+			}
+			else if (highestvalue - lowestvalue < 1)
+			{
 				numberformatter[i].setMaximumFractionDigits(4);
-			} else if (highestvalue - lowestvalue < 20) {
+			}
+			else if (highestvalue - lowestvalue < 20)
+			{
 				numberformatter[i].setMaximumFractionDigits(3);
-			} else if (highestvalue - lowestvalue < 100) {
+			}
+			else if (highestvalue - lowestvalue < 100)
+			{
 				numberformatter[i].setMaximumFractionDigits(1);
-			} else {
+			}
+			else
+			{
 				numberformatter[i].setMaximumFractionDigits(0);
 			}
 		}

@@ -30,7 +30,12 @@ import android.view.ContextThemeWrapper;
  * Important: Use GraphViewSeries.GraphViewSeriesStyle for series-specify styling
  *
  */
-public class GraphViewStyle {
+public class GraphViewStyle
+{
+	// BEGIN COB
+	private int verticalLabelsDecimalCount = -1;
+	// END COB
+
 	private int verticalLabelsColor;
 	private int horizontalLabelsColor;
 	private int gridColor;
@@ -103,6 +108,15 @@ public class GraphViewStyle {
 		return verticalLabelsWidth;
 	}
 
+	// BEGIN COB
+
+	public int getVerticalLabelsDecimalCount()
+	{
+		return verticalLabelsDecimalCount;
+	}
+
+	// END COB
+
 	private void setDefaults() {
 		verticalLabelsColor = Color.WHITE;
 		horizontalLabelsColor = Color.WHITE;
@@ -164,6 +178,10 @@ public class GraphViewStyle {
 	public void setVerticalLabelsColor(int c) {
 		verticalLabelsColor = c;
 	}
+
+	// BEGIN COB
+	public void setVerticalLabelsDecimalCount(int i) { verticalLabelsDecimalCount = i; }
+	// END COB
 
 	/**
 	 * @param verticalLabelsWidth 0 = auto
