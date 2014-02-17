@@ -20,6 +20,7 @@
 package com.jjoe64.graphview;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -30,15 +31,18 @@ public class GraphViewSeries {
 	/**
 	 * graph series style: color and thickness
 	 */
-	static public class GraphViewSeriesStyle {
+	static public class GraphViewSeriesStyle
+	{
 		public int color = 0xff0077cc;
 		public int thickness = 3;
 		private ValueDependentColor valueDependentColor;
 
-		public GraphViewSeriesStyle() {
+		public GraphViewSeriesStyle()
+		{
 			super();
 		}
-		public GraphViewSeriesStyle(int color, int thickness) {
+		public GraphViewSeriesStyle(int color, int thickness)
+		{
 			super();
 			this.color = color;
 			this.thickness = thickness;
@@ -63,27 +67,33 @@ public class GraphViewSeries {
 	GraphViewDataInterface[] values;
 	private final List<GraphView> graphViews = new ArrayList<GraphView>();
 
-	public GraphViewSeries(GraphViewDataInterface[] values) {
+	int index = -1;
+
+	public GraphViewSeries(GraphViewDataInterface[] values)
+	{
 		description = null;
 		style = new GraphViewSeriesStyle();
 		this.values = values;
 	}
 
-	public GraphViewSeries(String description, GraphViewSeriesStyle style, GraphViewDataInterface[] values) {
+	public GraphViewSeries(String description, GraphViewSeriesStyle style, GraphViewDataInterface[] values)
+	{
 		super();
 		this.description = description;
 		if (style == null) {
 			style = new GraphViewSeriesStyle();
 		}
 		this.style = style;
-		this.values = values;
+		this.values = new GraphViewDataInterface[values.length];
+		System.arraycopy(values, 0, this.values, 0, values.length);
 	}
 
 	/**
 	 * this graphview will be redrawn if data changes
 	 * @param graphView
 	 */
-	public void addGraphView(GraphView graphView) {
+	public void addGraphView(GraphView graphView)
+	{
 		this.graphViews.add(graphView);
 	}
 

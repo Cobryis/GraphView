@@ -67,12 +67,36 @@ public class BarGraphView extends GraphView {
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public void drawSeries(Canvas canvas, GraphViewDataInterface[] values, float graphwidth, float graphheight,
-			float border, double minX, double minY, double diffX, double diffY,
-			float horstart, GraphViewSeriesStyle style) {
+	public void drawSeries(Canvas canvas,
+	                       GraphViewSeries series,
+	                       float graphwidth,
+	                       float graphheight,
+	                       float border,
+	                       float horstart)
+	{
+		double minY = getMinY();
+		double diffY = getMaxY() - minY;
+
+		// if min/max is the same, fake it so that we can render a line
+		if (Double.compare(diffY, 0.0) == 0)
+		{
+			if (Double.compare(minY, 0.0) == 0)
+			{
+				// if both are zero, change the values to prevent division by zero
+				diffY = 1.0;
+			}
+			else
+			{
+				diffY = minY * .1;
+				minY *= .95;
+			}
+		}
+
+		GraphViewDataInterface[] values = _values(series.index);
+
 		float colwidth = graphwidth / (values.length);
 
-		paint.setStrokeWidth(style.thickness);
+		paint.setStrokeWidth(series.style.thickness);
 
 		float offset = 0;
 
@@ -83,10 +107,10 @@ public class BarGraphView extends GraphView {
 			float y = graphheight * ratY;
 
 			// hook for value dependent color
-			if (style.getValueDependentColor() != null) {
-				paint.setColor(style.getValueDependentColor().get(values[i]));
+			if (series.style.getValueDependentColor() != null) {
+				paint.setColor(series.style.getValueDependentColor().get(values[i]));
 			} else {
-				paint.setColor(style.color);
+				paint.setColor(series.style.color);
 			}
 
 			float left = (i * colwidth) + horstart -offset;

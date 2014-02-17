@@ -56,25 +56,48 @@ public class LineGraphView extends GraphView {
 	}
 
 	@Override
-	public void drawSeries(Canvas canvas, GraphViewDataInterface[] values, float graphwidth, float graphheight, float border, double minX, double minY, double diffX, double diffY, float horstart, GraphViewSeriesStyle style) {
-		// draw background
-		double lastEndY = 0;
-		double lastEndX = 0;
+	public void drawSeries(Canvas canvas, GraphViewSeries series, float graphwidth, float graphheight, float border, float horstart)
+	{
+
+		double minX = getMinX(false);
+		double minY = getMinY();
+		double diffX = getMaxX(false) - minX;
+		double diffY = getMaxY() - minY;
+
+		// if min/max is the same, fake it so that we can render a line
+		if (Double.compare(diffY, 0.0) == 0)
+		{
+			if (Double.compare(minY, 0.0) == 0)
+			{
+				// if both are zero, change the values to prevent division by zero
+				diffY = 1.0;
+			}
+			else
+			{
+				diffY = minY * .1;
+				minY *= .95;
+			}
+		}
 
 		// draw data
-		paint.setStrokeWidth(style.thickness);
-		paint.setColor(style.color);
-
+		paint.setStrokeWidth(series.style.thickness);
+		paint.setColor(series.style.color);
 
 		Path bgPath = null;
-		if (drawBackground) {
+		if (drawBackground)
+		{
 			bgPath = new Path();
 		}
 
-		lastEndY = 0;
-		lastEndX = 0;
+		double lastEndY = 0;
+		double lastEndX = 0;
+
 		float firstX = 0;
-		for (int i = 0; i < values.length; i++) {
+
+		GraphViewDataInterface[] values = _values(series.index);
+
+		for (int i = 0; i < values.length; i++)
+		{
 			double valY = values[i].getY() - minY;
 			double ratY = valY / diffY;
 			double y = graphheight * ratY;
