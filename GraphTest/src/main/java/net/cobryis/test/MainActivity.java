@@ -12,6 +12,7 @@ import com.jjoe64.graphview.GraphViewSeries;
 import com.jjoe64.graphview.GraphViewStyle;
 import com.jjoe64.graphview.LineGraphView;
 import com.jjoe64.graphview.GraphView.LegendAlign;
+import com.jjoe64.graphview.MultiBarGraphView;
 
 import java.util.Random;
 
@@ -23,14 +24,16 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-	    BarGraphView graph = new BarGraphView(getApplicationContext(), "Case vs Average (Seconds)");
+	    MultiBarGraphView graph = new MultiBarGraphView(getApplicationContext(), "Case vs Average (Seconds)");
 
 	    String[] names = { "One", "Two", "Three", "Four", "Fifty-Six", "Seven hundred and Eight-Nine"};
 	    graph.setHorizontalLabels(names);
 
 	    applyGraphStyle(graph);
 
-
+		// we set the horizontal labels, which will describe the data of the bars above
+	    // data should correspond perfectly to the labels
+	    // this means the data's x value does not matter, but instead it's index matters
 
 	    GraphView.GraphViewData[] data = new GraphView.GraphViewData[10];
 
@@ -49,12 +52,13 @@ public class MainActivity extends ActionBarActivity {
 
 	    for (int i =0; i < data.length; ++i)
 	    {
-		    data[i] = new GraphView.GraphViewData(i, rand.nextFloat()*10);
+		    data[i] = new GraphView.GraphViewData(i, rand.nextFloat()*11);
 	    }
 	    style = new GraphViewSeries.GraphViewSeriesStyle(getResources().getColor(android.R.color.holo_blue_bright), 10);
 
 	    GraphViewSeries series2 = new GraphViewSeries("Series 2", style, data);
 		graph.addSeries(series2);
+
 
 	    LinearLayout layout = (LinearLayout) findViewById(R.id.container);
 	    layout.addView(graph);
