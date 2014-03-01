@@ -5,6 +5,8 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.util.AttributeSet;
 
+import junit.framework.Assert;
+
 /**
  * Created by Cobryis on 2/2/14.
  *
@@ -14,6 +16,8 @@ import android.util.AttributeSet;
  */
 public class MultiBarGraphView extends BarGraphView
 {
+	private Field[] dataFields;
+
 	public MultiBarGraphView(Context context, AttributeSet attrs)
 	{
 		super(context, attrs);
@@ -31,18 +35,83 @@ public class MultiBarGraphView extends BarGraphView
 		setManualYAxis(0.0);
 	}
 
-	public void setFields()
+	/**
+	 * Sets the horizontal fields of the graph.
+	 * @param fieldNames
+	 */
+	public void setFields(String[] fieldNames)
 	{
+		staticHorizontalLabels = true;
+		dataFields = new Field[fieldNames.length];
+		for (int i = 0; i < fieldNames.length; ++i)
+		{
+			dataFields[i] = new Field(fieldNames[i]);
+		}
+	}
 
+	@Deprecated
+	@Override
+	public void setHorizontalLabels(String[] horlabels) {
+		setFields(horlabels);
 	}
 
 	@Override
-	public void drawSeries  (
-								Canvas canvas,
-	                            GraphViewSeries series,
-	                            float graphwidth, float graphheight,
-		                        float border, float horstart
-					        )
+	public void addSeries(GraphViewSeries series)
+	{
+		Assert.assertEquals("Series data length must match the number of fields in the graph!", series.values.length, dataFields.length);
+		super.addSeries(series);
+	}
+
+	@Override
+	protected void drawHorizontalLabels
+	(
+		Canvas canvas,
+        float border,
+        float horstart,
+        float height,
+        String[] unused,
+        float graphwidth
+	)
+	{
+		// horizontal labels + lines
+		int segmentLines = dataFields.length + 2;
+		for (int i = 0; i < dataFields.length; ++i)
+		{
+			paint.setColor(graphViewStyle.getGridColor());
+			float x = ((graphwidth / (segmentLines - 1)) * (i + 1)) + horstart;
+			canvas.drawLine(x, height - border, x, border, paint);
+
+			dataFields[i].setAlignPosition(x);
+
+			paint.setTextAlign(Paint.Align.CENTER);
+			paint.setColor(graphViewStyle.getHorizontalLabelsColor());
+			canvas.drawText(dataFields[i].getName(), x, height - 4, paint);
+		}
+	}
+
+	// cache
+	private float colWidth;
+	private float baseAlignOffset;
+
+	@Override
+	protected void preDraw
+	(
+		float graphWidth
+	)
+	{
+		colWidth = graphWidth / (dataFields.length + 2);
+		baseAlignOffset = colWidth / 2f;
+		colWidth /= getSeriesCount();
+	}
+
+	@Override
+	public void drawSeries
+	(
+		Canvas canvas,
+        GraphViewSeries series,
+        float graphWidth, float graphheight,
+        float border, float horstart
+    )
 	{
 		double minY = getMinY();
 		double diffY = getMaxY() - minY;
@@ -64,12 +133,6 @@ public class MultiBarGraphView extends BarGraphView
 
 		GraphViewDataInterface[] values = _values(series.index);
 
-		int seriesCount = getSeriesCount();
-
-		// columns will share a single field with other series' columns
-		// and so they are smaller if there are more series
-		float colWidth = graphwidth / (values.length * seriesCount);
-
 		paint.setStrokeWidth(series.style.thickness);
 
 		// draw data
@@ -89,9 +152,7 @@ public class MultiBarGraphView extends BarGraphView
 			float ratY = (float) (valY / diffY);
 			float y = graphheight * ratY;
 
-			float offset = series.index * colWidth;
-
-			float left = horstart + (i * colWidth * seriesCount) + offset;
+			float left = horstart + dataFields[i].getAlignPosition() - baseAlignOffset + (series.index * colWidth);
 			float top = (border - y) + graphheight;
 			float right = left + colWidth - 1;
 			canvas.drawRect(left, top, right, graphheight + border - 1, paint);

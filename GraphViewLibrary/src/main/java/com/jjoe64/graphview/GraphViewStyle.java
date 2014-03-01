@@ -126,7 +126,7 @@ public class GraphViewStyle
 		legendBorder = 10;
 		legendSpacing = 10;
 		legendMarginBottom = 0;
-		verticalLabelsAlign = Align.LEFT;
+		verticalLabelsAlign = Align.RIGHT;
 	}
 
 	public void setGridColor(int c) {

@@ -1,17 +1,15 @@
 package net.cobryis.test;
 
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
 
-import com.jjoe64.graphview.BarGraphView;
 import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.GraphView.LegendAlign;
 import com.jjoe64.graphview.GraphViewSeries;
 import com.jjoe64.graphview.GraphViewStyle;
-import com.jjoe64.graphview.LineGraphView;
-import com.jjoe64.graphview.GraphView.LegendAlign;
 import com.jjoe64.graphview.MultiBarGraphView;
 
 import java.util.Random;
@@ -26,8 +24,8 @@ public class MainActivity extends ActionBarActivity {
 
 	    MultiBarGraphView graph = new MultiBarGraphView(getApplicationContext(), "Case vs Average (Seconds)");
 
-	    String[] names = { "One", "Two", "Three", "Four", "Fifty-Six", "Seven hundred and Eight-Nine"};
-	    graph.setHorizontalLabels(names);
+	    String[] names = { "One", "Two", "Three", "Four", "Five", "Six"};
+	    graph.setFields(names);
 
 	    applyGraphStyle(graph);
 
@@ -35,7 +33,7 @@ public class MainActivity extends ActionBarActivity {
 	    // data should correspond perfectly to the labels
 	    // this means the data's x value does not matter, but instead it's index matters
 
-	    GraphView.GraphViewData[] data = new GraphView.GraphViewData[10];
+	    GraphView.GraphViewData[] data = new GraphView.GraphViewData[names.length];
 
 	    Random rand = new Random();
 
@@ -59,6 +57,14 @@ public class MainActivity extends ActionBarActivity {
 	    GraphViewSeries series2 = new GraphViewSeries("Series 2", style, data);
 		graph.addSeries(series2);
 
+		for (int i = 0; i < data.length; ++i)
+		{
+			data[i] = new GraphView.GraphViewData(i, rand.nextFloat()*10);
+		}
+	    style = new GraphViewSeries.GraphViewSeriesStyle(getResources().getColor(android.R.color.holo_red_light), 10);
+
+	    GraphViewSeries series3 = new GraphViewSeries("Series 3", style, data);
+	    graph.addSeries(series3);
 
 	    LinearLayout layout = (LinearLayout) findViewById(R.id.container);
 	    layout.addView(graph);

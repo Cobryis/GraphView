@@ -19,10 +19,6 @@
 
 package com.jjoe64.graphview;
 
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.List;
-
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -37,6 +33,10 @@ import android.view.View;
 import android.widget.LinearLayout;
 
 import com.jjoe64.graphview.compatible.ScaleGestureDetector;
+
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * GraphView is a Android View for creating zoomable and scrollable graphs.
@@ -97,10 +97,14 @@ abstract public class GraphView extends LinearLayout {
 			float graphheight = height - (2 * border);
 			graphwidth = width;
 
-			if (horlabels == null) {
+			preDraw(graphwidth);
+
+			if (!staticHorizontalLabels)
+			{
 				horlabels = generateHorlabels(graphwidth);
 			}
-			if (verlabels == null) {
+			if (!staticVerticalLabels)
+			{
 				verlabels = generateVerlabels(graphheight);
 			}
 
@@ -292,6 +296,32 @@ abstract public class GraphView extends LinearLayout {
 		}
 	}
 
+	public static class Field
+	{
+		private String name;
+		private float alignPosition;
+
+		protected Field(String name)
+		{
+			this.name = name;
+		}
+
+		protected void setAlignPosition(float position)
+		{
+			alignPosition = position;
+		}
+
+		public String getName()
+		{
+			return name;
+		}
+
+		public float getAlignPosition()
+		{
+			return alignPosition;
+		}
+	}
+
 	protected final Paint paint;
 	private String[] horlabels;
 	private String[] verlabels;
@@ -318,7 +348,7 @@ abstract public class GraphView extends LinearLayout {
 	private Integer horLabelTextWidth;
 	private Integer verLabelTextWidth;
 	private final Rect textBounds = new Rect();
-	private boolean staticHorizontalLabels;
+	protected boolean staticHorizontalLabels;
 	private boolean staticVerticalLabels;
 
 	public GraphView(Context context, AttributeSet attrs) {
@@ -413,6 +443,15 @@ abstract public class GraphView extends LinearLayout {
 		graphSeries.add(series);
 		series.index = graphSeries.size() - 1;
 		redrawAll();
+	}
+
+	/**
+	 * For calculations that should be done per graph, not per series.
+	 * @param graphWidth
+	 */
+	protected void preDraw(float graphWidth)
+	{
+
 	}
 
 	protected void drawHorizontalLabels(Canvas canvas,
