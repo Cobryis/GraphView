@@ -2,14 +2,36 @@ apply plugin: 'android-library'
 
 android {
     compileSdkVersion 18
-    buildToolsVersion "19.0.1"
-
+    buildToolsVersion '19.1.0'
     defaultConfig {
         minSdkVersion 7
         targetSdkVersion 18
     }
+    buildTypes {
+        debug {
+        }
+        release {
+        }
+        signingConfigs {
+        }
+    }
+    productFlavors {
+    }
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:+'
+    compile 'com.android.support:appcompat-v7:18.+'
 }
+
+task clearJar(type: Delete) {
+    delete 'build/libs/CobGraphView.jar'
+}
+
+task makeJar(type: Copy) {
+    from('build/bundles/release')
+    into('build/libs/')
+    include('classes.jar')
+    rename('classes.jar', 'CobGraphView.jar')
+}
+
+makeJar.dependsOn(clearJar, build)
