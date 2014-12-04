@@ -54,7 +54,7 @@ abstract public class GraphView extends LinearLayout {
 		static final float BORDER = 20;
 	}
 
-	private class GraphViewContentView extends View {
+	protected class GraphViewContentView extends View {
 		private float lastTouchEventX;
 		private float graphwidth;
 		private boolean scrollingStarted;
@@ -64,7 +64,7 @@ abstract public class GraphView extends LinearLayout {
 		 */
 		public GraphViewContentView(Context context) {
 			super(context);
-			setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
+			setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 		}
 
 		/**
@@ -101,23 +101,23 @@ abstract public class GraphView extends LinearLayout {
 
 			if (!staticHorizontalLabels)
 			{
-				horlabels = generateHorlabels(graphwidth);
+				horLabels = generateHorlabels(graphwidth);
 			}
 			if (!staticVerticalLabels)
 			{
-				verlabels = generateVerlabels(graphheight);
+				verLabels = generateVerlabels(graphheight);
 			}
 
 			// vertical lines
 			paint.setTextAlign(Align.LEFT);
-			int vers = verlabels.length - 1;
-			for (int i = 0; i < verlabels.length; i++) {
+			int vers = verLabels.length - 1;
+			for (int i = 0; i < verLabels.length; i++) {
 				paint.setColor(graphViewStyle.getGridColor());
 				float y = ((graphheight / vers) * i) + border;
 				canvas.drawLine(horstart, y, width, y, paint);
 			}
 
-			drawHorizontalLabels(canvas, border, horstart, height, horlabels, graphwidth);
+			drawHorizontalLabels(canvas, border, horstart, height, horLabels, graphwidth);
 
 			paint.setTextAlign(Align.CENTER);
 			canvas.drawText(title, (graphwidth / 2) + horstart, border - 4, paint);
@@ -150,8 +150,8 @@ abstract public class GraphView extends LinearLayout {
 				}
 
 				// labels have to be regenerated
-				if (!staticHorizontalLabels) horlabels = null;
-				if (!staticVerticalLabels) verlabels = null;
+				if (!staticHorizontalLabels) horLabels = null;
+				if (!staticVerticalLabels) verLabels = null;
 				viewVerLabels.invalidate();
 			}
 			invalidate();
@@ -271,8 +271,8 @@ abstract public class GraphView extends LinearLayout {
 			float height = getHeight();
 			float graphheight = height - (2 * border);
 
-			if (verlabels == null) {
-				verlabels = generateVerlabels(graphheight);
+			if (verLabels == null) {
+				verLabels = generateVerlabels(graphheight);
 			}
 
 			// vertical labels
@@ -284,11 +284,11 @@ abstract public class GraphView extends LinearLayout {
 			} else if (getGraphViewStyle().getVerticalLabelsAlign() == Align.CENTER) {
 				labelsOffset = labelsWidth / 2;
 			}
-			int vers = verlabels.length - 1;
-			for (int i = 0; i < verlabels.length; i++) {
+			int vers = verLabels.length - 1;
+			for (int i = 0; i < verLabels.length; i++) {
 				float y = ((graphheight / vers) * i) + border;
 				paint.setColor(graphViewStyle.getVerticalLabelsColor());
-				canvas.drawText(verlabels[i], labelsOffset, y, paint);
+				canvas.drawText(verLabels[i], labelsOffset, y, paint);
 			}
 
 			// reset
@@ -300,6 +300,8 @@ abstract public class GraphView extends LinearLayout {
 	{
 		private String name;
 		private float alignPosition;
+
+		public boolean isSelected = false;
 
 		protected Field(String name)
 		{
@@ -322,10 +324,10 @@ abstract public class GraphView extends LinearLayout {
 		}
 	}
 
-	protected final Paint paint;
-	private String[] horlabels;
-	private String[] verlabels;
-	private String title;
+	protected final Paint paint = new Paint();
+	private String[] horLabels;
+	private String[] verLabels;
+	private String title = "";
 	private boolean scrollable;
 	private boolean disableTouch;
 	private double viewportStart;
@@ -334,15 +336,13 @@ abstract public class GraphView extends LinearLayout {
 	private ScaleGestureDetector scaleDetector;
 	private boolean scalable;
 	private final NumberFormat[] numberformatter = new NumberFormat[2];
-	private final ArrayList<GraphViewSeries> graphSeries;
+	private final ArrayList<GraphViewSeries> graphSeries = new ArrayList<GraphViewSeries>();
 	private boolean showLegend = false;
 	private LegendAlign legendAlign = LegendAlign.MIDDLE;
 	private boolean manualYAxis;
 	private boolean manualYCeiling;
 	private double manualMaxYValue;
 	private double manualMinYValue;
-	protected GraphViewStyle graphViewStyle;
-	private final GraphViewContentView graphViewContentView;
 	private CustomLabelFormatter customLabelFormatter;
 	private Integer labelTextHeight;
 	private Integer horLabelTextWidth;
@@ -351,7 +351,11 @@ abstract public class GraphView extends LinearLayout {
 	protected boolean staticHorizontalLabels;
 	private boolean staticVerticalLabels;
 
-	public GraphView(Context context, AttributeSet attrs) {
+	protected GraphViewStyle graphViewStyle = new GraphViewStyle();
+	protected final GraphViewContentView graphViewContentView;
+
+	public GraphView(Context context, AttributeSet attrs)
+	{
 		this(context, attrs.getAttributeValue(null, "title"));
 
 		int width = attrs.getAttributeIntValue("android", "layout_width", LayoutParams.MATCH_PARENT);
@@ -363,25 +367,22 @@ abstract public class GraphView extends LinearLayout {
 	 * @param context
 	 * @param title [optional]
 	 */
-	public GraphView(Context context, String title) {
+	public GraphView(Context context, String title)
+	{
+		this(context);
+		setTitle(title);
+	}
+
+	public GraphView(Context context)
+	{
 		super(context);
-		setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
-
-		if (title == null)
-			this.title = "";
-		else
-			this.title = title;
-
-		graphViewStyle = new GraphViewStyle();
 		graphViewStyle.useTextColorFromTheme(context);
-
-		paint = new Paint();
-		graphSeries = new ArrayList<GraphViewSeries>();
 
 		viewVerLabels = new VerLabelsView(context);
 		addView(viewVerLabels);
+
 		graphViewContentView = new GraphViewContentView(context);
-		addView(graphViewContentView, new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT, 1));
+		addView(graphViewContentView, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, 1));
 	}
 
 	private List<GraphViewDataInterface> tempValueList = new ArrayList<GraphViewDataInterface>();
@@ -781,8 +782,8 @@ abstract public class GraphView extends LinearLayout {
 	 * Normally there is no need to call this manually.
 	 */
 	public void redrawAll() {
-		if (!staticVerticalLabels) verlabels = null;
-		if (!staticHorizontalLabels) horlabels = null;
+		if (!staticVerticalLabels) verLabels = null;
+		if (!staticHorizontalLabels) horLabels = null;
 		numberformatter[0] = null;
 		numberformatter[1] = null;
 		labelTextHeight = null;
@@ -840,8 +841,8 @@ abstract public class GraphView extends LinearLayout {
 
 		// don't clear labels width/height cache
 		// so that the display is not flickering
-		if (!staticVerticalLabels) verlabels = null;
-		if (!staticHorizontalLabels) horlabels = null;
+		if (!staticVerticalLabels) verLabels = null;
+		if (!staticHorizontalLabels) horLabels = null;
 
 		invalidate();
 		viewVerLabels.invalidate();
@@ -879,7 +880,7 @@ abstract public class GraphView extends LinearLayout {
 	 */
 	public void setHorizontalLabels(String[] horlabels) {
 		staticHorizontalLabels = horlabels != null;
-		this.horlabels = horlabels;
+		this.horLabels = horlabels;
 	}
 
 	/**
@@ -993,8 +994,9 @@ abstract public class GraphView extends LinearLayout {
 	 * sets the title of graphview
 	 * @param title
 	 */
-	public void setTitle(String title) {
-		this.title = title;
+	public void setTitle(String title)
+	{
+		this.title = title != null ? title : "";
 	}
 
 	/**
@@ -1003,7 +1005,7 @@ abstract public class GraphView extends LinearLayout {
 	 */
 	public void setVerticalLabels(String[] verlabels) {
 		staticVerticalLabels = verlabels != null;
-		this.verlabels = verlabels;
+		this.verLabels = verlabels;
 	}
 
 	/**

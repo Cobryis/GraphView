@@ -8,4 +8,14 @@
     tools:ignore="MergeRootFrame"
 
 
-    />
+    >
+
+    <ImageView
+        android:layout_width="140dp"
+        android:layout_height="83dp"
+        android:id="@+id/imageView"
+        android:layout_gravity="center_vertical"
+        android:src="@drawable/abc_cab_background_top_holo_dark"
+        android:maxWidth="50dp"
+        android:maxHeight="50dp"/>
+</LinearLayout>

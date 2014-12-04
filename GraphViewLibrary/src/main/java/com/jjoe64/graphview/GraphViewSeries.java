@@ -20,7 +20,6 @@
 package com.jjoe64.graphview;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -84,8 +83,7 @@ public class GraphViewSeries {
 			style = new GraphViewSeriesStyle();
 		}
 		this.style = style;
-		this.values = new GraphViewDataInterface[values.length];
-		System.arraycopy(values, 0, this.values, 0, values.length);
+		this.values = values;
 	}
 
 	/**

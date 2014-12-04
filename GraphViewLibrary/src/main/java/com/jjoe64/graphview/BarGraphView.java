@@ -25,8 +25,6 @@ import android.graphics.Color;
 import android.graphics.Paint.Align;
 import android.util.AttributeSet;
 
-import com.jjoe64.graphview.GraphViewSeries.GraphViewSeriesStyle;
-
 /**
  * Draws a Bar Chart
  * @author Muhammad Shahab Hameed
@@ -41,6 +39,11 @@ public class BarGraphView extends GraphView {
 
 	public BarGraphView(Context context, String title) {
 		super(context, title);
+	}
+
+	public BarGraphView(Context context)
+	{
+		super(context);
 	}
 
 	@Override
